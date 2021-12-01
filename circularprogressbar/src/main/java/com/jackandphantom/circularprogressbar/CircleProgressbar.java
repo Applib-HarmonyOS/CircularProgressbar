@@ -1,118 +1,125 @@
 package com.jackandphantom.circularprogressbar;
 
-import android.animation.ObjectAnimator;
-import android.content.Context;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RectF;
-import android.util.AttributeSet;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.animation.DecelerateInterpolator;
+import ohos.agp.components.AttrSet;
+import ohos.agp.components.Component;
+import ohos.agp.components.Component.DrawTask;
+import ohos.agp.components.Component.EstimateSizeListener;
+import ohos.agp.components.Component.TouchEventListener;
+import ohos.agp.render.Arc;
+import ohos.agp.render.Paint;
+import ohos.agp.utils.Color;
+import ohos.agp.utils.RectFloat;
+import ohos.app.Context;
+import ohos.multimodalinput.event.MmiPoint;
+import ohos.multimodalinput.event.TouchEvent;
+import com.hmos.compat.utils.AttrUtils;
 
-
-public class CircleProgressbar extends View {
-
-    /* innerCircle  is used to draw reference surface on which progress circle is drawn and move */
+/**
+ * CircleProgressbar.
+ */
+public class CircleProgressbar extends Component implements DrawTask, EstimateSizeListener, TouchEventListener {
+    /* InnerCircle  is used to draw reference surface on which progress circle is drawn and moved. */
     private Paint innerCircle = new Paint();
-
-    /* outerCircle is used for progress circle which progress your status*/
+    /* OuterCircle is used for progress circle which progress your status. */
     private Paint outerCircle = new Paint();
-
-    /*widht and height is used to get view's width and height*/
-    private int width, height;
-
-    /* These two values is used as a default value for foreground (progress) circle
-     *  and other is used for background circle width how much width will both circle's
-    */
-    private final int DEFAULT_FOREGROUND_PROGRESS_WIDTH = 10;
-    private final int DEFAULT_BACKGROUND_CIRCLE_WIDTH = 10;
-
-    /* rectF is used for make progress circle which is basically a arc so it's contain the bounds of arc */
-    private RectF rectF = new RectF();
-
-    /* this boolean value is for touch event is move  */
-    private boolean moveCorrect;
-
-    /* backgroundProgressWidth is used for background progress width */
-    private int backgroundProgressWidth;
-
-    /* foregroundProgressWidth is used for foreground progress width */
-    private int foregroundProgressWidth;
-
-    /* backgroundProgressColor is used for background progress color */
-    private int backgroundProgressColor;
-
-    /* This is the default value of background progress color
+    /* Width and height is used to get view's width and height. */
+    private int width;
+    private int height;
+    /**
+     * These two values are used as default value for foreground (progress) circle
+     * and other is used for background circle width how much width will both circle's.
      */
-    private int DEFAULT_BACKGROUND_PROGRESS_COLOR = Color.GRAY;
-    /* These two variables are used for foreground progess color
-   * if no color is specified by the user then for default we use these variables
-      * */
+    private static final int DEFAULT_FOREGROUND_PROGRESS_WIDTH = 10;
+    private static final int DEFAULT_BACKGROUND_CIRCLE_WIDTH = 10;
+    /* rectF is used for make progress circle which is basically a arc so it's contain the bounds of arc. */
+    private RectFloat rectF = new RectFloat();
+    /* This boolean value is for touch event is move. */
+    private boolean moveCorrect;
+    /* BackgroundProgressWidth is used for background progress width. */
+    private int backgroundProgressWidth;
+    /* foregroundProgressWidth is used for foreground progress width. */
+    private int foregroundProgressWidth;
+    /* backgroundProgressColor is used for background progress color. */
+    private int backgroundProgressColor;
+    /* This is the default value of background progress color. */
+    private static final int DEFAULT_BACKGROUND_PROGRESS_COLOR = ohos.agp.utils.Color.GRAY.getValue();
+    /**
+     * These two variables are used for foreground progress color if no color is specified
+     * by the user then for default we use these variables.
+     */
     private int foregroundProgressColor;
-    private int DEFAULT_FOREGROUND_PROGRESS_COLOR = Color.BLACK;
-
-    /*Progess is used for progress in progressbar*/
+    private static final int DEFAULT_FOREGROUND_PROGRESS_COLOR = ohos.agp.utils.Color.BLACK.getValue();
+    /* Progress is used for progress in progressbar. */
     private float progress = 0;
-
-    /* start angle is used where the progress should start so according to android it will -90 */
-    private int   startAngle = -90;
-
-    /* sweep angle is used for progress angle in progress bar*/
+    /* start angle is used where the progress should start so according to android it will -90. */
+    private int startAngle = -90;
+    /* sweep angle is used for progress angle in progress bar. */
     private float sweepAngle = 0;
-
-    /* max progress as name implies this is used for finding the max value for progress
-    * default it's value is 100
-    * */
+    /**
+     * max progress as name implies this is used for finding the max value for progress
+     *  default it's value is 100.
+     */
     private float maxProgress = 100;
-
-    /*centerPoint is used for findiding the smallest value between width and height of view */
+    /* centerPoint is used for finding the smallest value between width and height of view. */
     private int centerPoint;
-
-    /* subtractingValues is used to find which one is bigger among the background circle and foreground circle */
+    /* subtractingValues is used to find which one is bigger among the background circle and foreground circle. */
     private int subtractingValue;
-
-    /* As the name says this will used for checking that progress start from clockwise or counter clockwise */
+    /* As the name says this will used for checking that progress start from clockwise or counter clockwise. */
     private boolean clockWise;
-    private int drawRadius, drawOuterRadius;
-
-    /* This is default timing of animation which is used to progresss the progress bar */
-    private int DEFAULT_ANIMATION_DURATION = 1500;
-
-    /*This name says that progress bar should be touchable or not*/
+    private int drawRadius;
+    private int drawOuterRadius;
+    /* This name says that progress bar should be touchable or not. */
     private boolean isTouchEnabled = false;
     private boolean roundedCorner;
+    private OnProgressbarChangeListener onProgressbarChangeListener;
 
-    private  OnProgressbarChangeListener onProgressbarChangeListener;
-
+    /**
+     * This is CircleProgressbar constructor.
+     *
+     * @param context Context
+     */
     public CircleProgressbar(Context context) {
         super(context);
         init();
+        addDrawTask(this);
+        setEstimateSizeListener(this);
+        setTouchEventListener(this);
     }
 
-    public CircleProgressbar(Context context, AttributeSet attrs) {
+    /**
+     * This is CircleProgressbar constructor.
+     *
+     * @param context Context
+     * @param attrs AttrSet
+     */
+    public CircleProgressbar(Context context, AttrSet attrs) {
         this(context, attrs, 0);
-
+        addDrawTask(this);
+        setEstimateSizeListener(this);
+        setTouchEventListener(this);
     }
 
-    /* TypedArray used to getting all the values from xml (user) */
-    public CircleProgressbar(Context context, AttributeSet attrs, int i) {
+    /**
+     * TypedArray used to getting all the values from xml (user).
+     *
+     * @param context Context
+     * @param attrs AttrSet
+     * @param i integer
+     */
+    public CircleProgressbar(Context context, AttrSet attrs, int i) {
         super(context, attrs, i);
-
-        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.CircleProgressbar,0,0);
-        backgroundProgressWidth = a.getInteger(R.styleable.CircleProgressbar_cpb_backgroundProgressWidth, DEFAULT_BACKGROUND_CIRCLE_WIDTH);
-        foregroundProgressWidth = a.getInteger(R.styleable.CircleProgressbar_cpb_foregroundProgressWidth, DEFAULT_FOREGROUND_PROGRESS_WIDTH);
-        backgroundProgressColor = a.getColor(R.styleable.CircleProgressbar_cpb_backgroundProgressColor, DEFAULT_BACKGROUND_PROGRESS_COLOR);
-        foregroundProgressColor = a.getColor(R.styleable.CircleProgressbar_cpb_foregroundProgressColor, DEFAULT_FOREGROUND_PROGRESS_COLOR);
-        this.progress                = a.getFloat(R.styleable.CircleProgressbar_cpb_progress, progress);
-        this.roundedCorner      = a.getBoolean(R.styleable.CircleProgressbar_cpb_roundedCorner, false);
-        this.clockWise      = a.getBoolean(R.styleable.CircleProgressbar_cpb_clockwise, false);
-        this.isTouchEnabled      = a.getBoolean(R.styleable.CircleProgressbar_cpb_touchEnabled, false);
-
-
-        a.recycle();
+        backgroundProgressWidth = AttrUtils.getIntFromAttr(attrs, "cpb_backgroundProgressWidth",
+                DEFAULT_BACKGROUND_CIRCLE_WIDTH);
+        foregroundProgressWidth = AttrUtils.getIntFromAttr(attrs, "cpb_foregroundProgressWidth",
+                DEFAULT_FOREGROUND_PROGRESS_WIDTH);
+        backgroundProgressColor = AttrUtils.getColorFromAttr(attrs, "cpb_backgroundProgressColor",
+                DEFAULT_BACKGROUND_PROGRESS_COLOR);
+        foregroundProgressColor = AttrUtils.getColorFromAttr(attrs, "cpb_foregroundProgressColor",
+                DEFAULT_FOREGROUND_PROGRESS_COLOR);
+        this.progress = AttrUtils.getFloatFromAttr(attrs, "cpb_progress", progress);
+        this.roundedCorner = AttrUtils.getBooleanFromAttr(attrs, "cpb_roundedCorner", false);
+        this.clockWise = AttrUtils.getBooleanFromAttr(attrs, "cpb_clockwise", false);
+        this.isTouchEnabled = AttrUtils.getBooleanFromAttr(attrs, "cpb_touchEnabled", false);
         init();
         if (roundedCorner) {
             setRoundedCorner(roundedCorner);
@@ -120,207 +127,197 @@ public class CircleProgressbar extends View {
         if (this.progress > 0) {
             setProgress(this.progress);
         }
-
         if (clockWise) {
             setClockwise(clockWise);
         }
-
         if (isTouchEnabled) {
             enabledTouch(isTouchEnabled);
         }
+        addDrawTask(this);
+        setEstimateSizeListener(this);
+        setTouchEventListener(this);
     }
 
-    /* initialize paint object for drawing shapes  */
+    /* Initialize paint object for drawing shapes  */
     private void init() {
-
-
         innerCircle.setStrokeWidth(foregroundProgressWidth);
         innerCircle.setAntiAlias(true);
-        innerCircle.setStyle(Paint.Style.STROKE);
-        innerCircle.setColor(foregroundProgressColor);
-
-        outerCircle.setStrokeWidth(backgroundProgressWidth );
+        innerCircle.setStyle(ohos.agp.render.Paint.Style.STROKE_STYLE);
+        Color hmosColor = CircleProgressbar.changeParamToColor(foregroundProgressColor);
+        innerCircle.setColor(hmosColor);
+        outerCircle.setStrokeWidth(backgroundProgressWidth);
         outerCircle.setAntiAlias(true);
-        outerCircle.setColor(backgroundProgressColor);
-        outerCircle.setStyle(Paint.Style.STROKE);
+        Color hmosColor1 = CircleProgressbar.changeParamToColor(backgroundProgressColor);
+        outerCircle.setColor(hmosColor1);
+        outerCircle.setStyle(ohos.agp.render.Paint.Style.STROKE_STYLE);
     }
 
-
-    /*Here we draw two things first circle you can say this is surface on which arc means progress will drawn*/
+    /**
+     * Here we draw two things, first circle you can say this is surface on which arc means progress will drawn.
+     *
+     * @param component Component
+     * @param canvas Canvas
+     */
     @Override
-    protected void onDraw(Canvas canvas) {
-
-
-
+    public void onDraw(Component component, ohos.agp.render.Canvas canvas) {
+        onEstimateSize(component.getEstimatedWidth(), component.getEstimatedHeight());
         canvas.drawCircle(centerPoint, centerPoint, drawRadius, outerCircle);
-        canvas.drawArc(rectF, startAngle, sweepAngle, false, innerCircle);
-        super.onDraw(canvas);
+        Arc arc = CircleProgressbar.changeParamToArc(startAngle, sweepAngle, false);
+        canvas.drawArc(rectF, arc, innerCircle);
     }
 
-    /* This is callback method which find how much size will assign to this child view */
+    /**
+     * This is callback method which is used to find how much size will be assigned to this child view.
+     *
+     * @param widthMeasureSpec integer
+     * @param heightMeasureSpec integer
+     * @return false
+     */
     @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        width = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-        height = getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec);
-        centerPoint = Math.min(width , height);
+    public boolean onEstimateSize(int widthMeasureSpec, int heightMeasureSpec) {
+        width = getEstimatedWidth();
+        height = getEstimatedHeight();
+        centerPoint = Math.min(width, height);
         int min = Math.min(width, height);
-        setMeasuredDimension(min, min);
+        setEstimatedSize(min, min);
         setRadiusRect();
+        return false;
     }
 
-    /* getting the bounds of both background and foreground circle */
+    /* Getting the bounds of both background and foreground circle. */
     private void setRadiusRect() {
-        centerPoint = Math.min(width, height) /2 ;
-        subtractingValue = (backgroundProgressWidth > foregroundProgressWidth) ? backgroundProgressWidth : foregroundProgressWidth;
+        centerPoint = Math.min(width, height) / 2;
+        subtractingValue = (backgroundProgressWidth > foregroundProgressWidth)
+                ? backgroundProgressWidth : foregroundProgressWidth;
         int newSeekWidth = subtractingValue / 2;
-        drawRadius = Math.min((width - subtractingValue)/ 2, (height - subtractingValue)/2);
-        drawOuterRadius=  Math.min((width - newSeekWidth), (height - newSeekWidth));
-        rectF.set(subtractingValue /2, subtractingValue /2, drawOuterRadius, drawOuterRadius);
+        drawRadius = Math.min((width - subtractingValue) / 2, (height - subtractingValue) / 2);
+        drawOuterRadius = Math.min((width - newSeekWidth), (height - newSeekWidth));
+        rectF.modify(subtractingValue / 2, subtractingValue / 2, drawOuterRadius, drawOuterRadius);
     }
 
-  /* This is touchEvent callback is active when user is need this for getting the touch event in his app so
-    * he need to make true to touch event
-      * */
+    /**
+     * This touchEvent callback is active when user needs this for getting the touch event in his app so
+     * he needs to make touch event true.
+     *
+     * @param component Component
+     * @param event Touchevent
+     * @return false
+     */
     @Override
-    public boolean onTouchEvent(MotionEvent event) {
-
+    public boolean onTouchEvent(Component component, ohos.multimodalinput.event.TouchEvent event) {
+        MmiPoint point = event.getPointerPosition(0);
         if (isTouchEnabled) {
             switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    if (onProgressbarChangeListener != null)
+                case TouchEvent.PRIMARY_POINT_DOWN:
+                    if (onProgressbarChangeListener != null) {
                         onProgressbarChangeListener.onStartTracking(this);
-                    checkForCorrect(event.getX(), event.getY());
+                    }
+                    checkForCorrect(point.getX(), point.getY());
                     break;
-                case MotionEvent.ACTION_MOVE:
-                    if (moveCorrect)
-                        justMove(event.getX(), event.getY());
+                case TouchEvent.POINT_MOVE:
+                    if (moveCorrect) {
+                        justMove(point.getX(), point.getY());
+                    }
                     upgradeProgress(this.progress, true);
-
                     break;
-                case MotionEvent.ACTION_UP:
-                    if (onProgressbarChangeListener != null)
+                case TouchEvent.PRIMARY_POINT_UP:
+                    if (onProgressbarChangeListener != null) {
                         onProgressbarChangeListener.onStopTracking(this);
+                    }
                     moveCorrect = false;
                     break;
+                default:
+                    //do nothing
             }
-
             return true;
         }
         return false;
     }
-/* update progress is used when setProgress is used so first this method upadate the value of progress and then
 
- * update the value of sweepangle and according to clockwise it's also decides that sweep
- *
-  * andle should be positive or negative
-  * */
+    /**
+     * Update progress is used when setProgress is used, so first this method updates the value of progress and then
+     * update the value of sweepangle and according to clockwise it also decides
+     * that sweep angle to be positive or negative.
+     *
+     * @param progress float
+     * @param b boolean
+     */
     private void upgradeProgress(float progress, boolean b) {
-        this.progress = (progress<=maxProgress) ? progress : maxProgress;
-        sweepAngle =  (360 * progress / maxProgress);
-
-        if (this.clockWise) {
-            if (sweepAngle > 0) {
-                sweepAngle = -sweepAngle;
-            }
+        this.progress = (progress <= maxProgress) ? progress : maxProgress;
+        sweepAngle = (360 * progress / maxProgress);
+        if (this.clockWise && sweepAngle > 0) {
+            sweepAngle = -sweepAngle;
         }
-        if (onProgressbarChangeListener != null)
+        if (onProgressbarChangeListener != null) {
             onProgressbarChangeListener.onProgressChanged(this, progress, b);
+        }
         invalidate();
-
     }
 
-    /*when the user make touchevent true then this method will be called and it's works is to incress and decress the
-
-    * sweep value so it directly increases and dicreseas the values of progress bar
-    * */
-
+    /**
+     * When the user make touch event true then this method will be called and it's work is to increase and decrease the
+     * sweep value so it's directly increases and decreases the values of progress bar.
+     *
+     * @param x float
+     * @param y float
+     */
     private void justMove(float x, float y) {
-
         if (clockWise) {
-            float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y ));
+            float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y));
             if (degree > 0) {
                 degree -= 360;
             }
             sweepAngle = degree;
-        }
-        else  {
-            float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y ));
+        } else {
+            float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y));
             if (degree < 0) {
                 degree += 360;
             }
-
             sweepAngle = degree;
         }
-
         progress = (sweepAngle * maxProgress / 360);
-
-       /* float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y ));
-        if (degree < 0) {
-            degree += 360;
-        }
-
-             sweepAngle = degree;*/
         invalidate();
-
     }
 
-    /* This method is also used by touchevent so it's just find that user click on circle or not */
+    /* This method is also used by touch event so it's just find that user click on circle or not */
     private void checkForCorrect(float x, float y) {
-
-        float distance = (float) Math.sqrt(Math.pow((x - centerPoint), 2) + Math.pow((y - centerPoint),2));
-        if (distance < drawOuterRadius/2 + subtractingValue && distance > drawOuterRadius/2 - subtractingValue*2 ) {
-
-
+        float distance = (float) Math.sqrt(Math.pow((x - centerPoint), 2) + Math.pow((y - centerPoint), 2));
+        if (distance < drawOuterRadius / 2 + subtractingValue && distance
+                > drawOuterRadius / 2 - subtractingValue * 2) {
             moveCorrect = true;
-            if (clockWise) {
-                float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y ));
-
-                if (degree > 0) {
-                    degree -= 360;
-                }
-
-                sweepAngle = degree;
-            }
-            else  {
-                float degree = (float) Math.toDegrees(Math.atan2(x - centerPoint, centerPoint - y ));
-                if (degree < 0) {
-                    degree += 360;
-                }
-
-                sweepAngle = degree;
-            }
-
-
-
-
-            progress = (sweepAngle * maxProgress / 360);
-
-            invalidate();
+            justMove(x, y);
         }
-
-
-
     }
 
+    /**
+     * This method is used to set the OnProgressbarChangeListener.
+     *
+     * @param onProgressbarChangeListener OnProgressbarChangeListener
+     */
     public void setOnProgressbarChangeListener(OnProgressbarChangeListener onProgressbarChangeListener) {
         this.onProgressbarChangeListener = onProgressbarChangeListener;
     }
 
-    /* This is interface for informing about the progress */
-
+    /**
+     * This is interface for informing about the progress.
+     */
     public interface OnProgressbarChangeListener {
         void onProgressChanged(CircleProgressbar circleSeekbar, float progress, boolean fromUser);
+
         void onStartTracking(CircleProgressbar circleSeekbar);
+
         void onStopTracking(CircleProgressbar circleSeekbar);
     }
 
-    /* All getter and setter region */
+    /**
+     * This setter method is used to set the boolean value clockwise.
+     *
+     * @param clockwise boolean
+     */
     public void setClockwise(boolean clockwise) {
         this.clockWise = clockwise;
-        if (this.clockWise) {
-            if (sweepAngle > 0) {
-                sweepAngle = -sweepAngle;
-            }
+        if (this.clockWise && sweepAngle > 0) {
+            sweepAngle = -sweepAngle;
         }
         invalidate();
     }
@@ -337,10 +334,15 @@ public class CircleProgressbar extends View {
         return this.maxProgress;
     }
 
+    /**
+     * This method is used to set the background progress width.
+     *
+     * @param width integer
+     */
     public void setBackgroundProgressWidth(int width) {
         this.backgroundProgressWidth = width;
         outerCircle.setStrokeWidth(backgroundProgressWidth);
-        requestLayout();
+        postLayout();
         invalidate();
     }
 
@@ -348,10 +350,15 @@ public class CircleProgressbar extends View {
         return this.backgroundProgressWidth;
     }
 
+    /**
+     * This method is used to set the foreground progress width.
+     *
+     * @param width integer
+     */
     public void setForegroundProgressWidth(int width) {
         this.foregroundProgressWidth = width;
         innerCircle.setStrokeWidth(foregroundProgressWidth);
-        requestLayout();
+        postLayout();
         invalidate();
     }
 
@@ -359,11 +366,16 @@ public class CircleProgressbar extends View {
         return this.foregroundProgressWidth;
     }
 
-
+    /**
+     * This method is used to set the background progress color.
+     *
+     * @param color integer
+     */
     public void setBackgroundProgressColor(int color) {
         this.backgroundProgressColor = color;
-        outerCircle.setColor(color);
-        requestLayout();
+        Color hmosColor = CircleProgressbar.changeParamToColor(color);
+        outerCircle.setColor(hmosColor);
+        postLayout();
         invalidate();
     }
 
@@ -371,10 +383,16 @@ public class CircleProgressbar extends View {
         return this.backgroundProgressColor;
     }
 
+    /**
+     * This method is used to set the foreground progress color.
+     *
+     * @param color integer
+     */
     public void setForegroundProgressColor(int color) {
         this.foregroundProgressColor = color;
-        innerCircle.setColor(color);
-        requestLayout();
+        Color hmosColor = CircleProgressbar.changeParamToColor(color);
+        innerCircle.setColor(hmosColor);
+        postLayout();
         invalidate();
     }
 
@@ -386,12 +404,21 @@ public class CircleProgressbar extends View {
         return progress;
     }
 
+    /**
+     * This method is used to set progress.
+     *
+     * @param progress float
+     */
     public void setProgress(float progress) {
         upgradeProgress(progress, false);
-
     }
 
-    public void enabledTouch (boolean enabled) {
+    /**
+     * This method is used to enable touch.
+     *
+     * @param enabled boolean
+     */
+    public void enabledTouch(boolean enabled) {
         this.isTouchEnabled = enabled;
         invalidate();
     }
@@ -400,14 +427,18 @@ public class CircleProgressbar extends View {
         return this.isTouchEnabled;
     }
 
+    /**
+     * This method is used to set the round corner.
+     *
+     * @param roundedCorner boolean
+     */
     public void setRoundedCorner(boolean roundedCorner) {
         if (roundedCorner) {
-            innerCircle.setStrokeCap(Paint.Cap.ROUND);
-            outerCircle.setStrokeCap(Paint.Cap.ROUND);
-        }
-        else {
-            innerCircle.setStrokeCap(Paint.Cap.SQUARE);
-            outerCircle.setStrokeCap(Paint.Cap.SQUARE);
+            innerCircle.setStrokeCap(ohos.agp.render.Paint.StrokeCap.ROUND_CAP);
+            outerCircle.setStrokeCap(ohos.agp.render.Paint.StrokeCap.ROUND_CAP);
+        } else {
+            innerCircle.setStrokeCap(ohos.agp.render.Paint.StrokeCap.SQUARE_CAP);
+            outerCircle.setStrokeCap(ohos.agp.render.Paint.StrokeCap.SQUARE_CAP);
         }
         invalidate();
     }
@@ -416,24 +447,25 @@ public class CircleProgressbar extends View {
         return this.roundedCorner;
     }
 
-    /*Adding the animation to progressbar*/
-    public void setProgressWithAnimation(float progress) {
-
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(this, "progress", progress);
-        objectAnimator.setDuration(DEFAULT_ANIMATION_DURATION);
-        objectAnimator.setInterpolator(new DecelerateInterpolator());
-        objectAnimator.start();
-
+    /**
+     * This method is used to change parameter to color.
+     *
+     * @param color integer
+     * @return new Color(color)
+     */
+    public static Color changeParamToColor(int color) {
+        return new Color(color);
     }
 
-    public void setProgressWithAnimation(float progress, int duration) {
-
-        ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(this, "progress", progress);
-        objectAnimator.setDuration(duration);
-        objectAnimator.setInterpolator(new DecelerateInterpolator());
-        objectAnimator.start();
-
+    /**
+     * This method is used to change parameter to arc.
+     *
+     * @param startAngle float
+     * @param sweepAngle float
+     * @param useCenter boolean
+     * @return new Arc(startAngle, sweepAngle, useCenter)
+     */
+    public static Arc changeParamToArc(float startAngle, float sweepAngle, boolean useCenter) {
+        return new Arc(startAngle, sweepAngle, useCenter);
     }
-
 }
-
