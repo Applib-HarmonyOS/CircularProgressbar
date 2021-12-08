@@ -81,9 +81,7 @@ public class CircleProgressbar extends Component implements DrawTask, EstimateSi
     public CircleProgressbar(Context context) {
         super(context);
         init();
-        addDrawTask(this);
-        setEstimateSizeListener(this);
-        setTouchEventListener(this);
+        initialize();
     }
 
     /**
@@ -94,6 +92,10 @@ public class CircleProgressbar extends Component implements DrawTask, EstimateSi
      */
     public CircleProgressbar(Context context, AttrSet attrs) {
         this(context, attrs, 0);
+        initialize();
+    }
+
+    private void initialize() {
         addDrawTask(this);
         setEstimateSizeListener(this);
         setTouchEventListener(this);

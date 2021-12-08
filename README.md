@@ -70,9 +70,15 @@ Properties
 ```
 
 ## Future Work
-Due to unavailability of similar api as ObjectAnimator in HarmonyOS platform, the animation behaviour is not exactly the same as android base library but it is similar.
+Due to unavailability of similar api as ObjectAnimator in HarmonyOS platform, the following APIs are not supported:
+
+public void setProgressWithAnimation(float progress); <br />
+public void setProgressWithAnimation(float progress, int duration);
+
+Once the platform includes ObjectAnimator support, the above APIs can be supported.
                                                                                                    
 ## Licence
+Copyright 2017 Ankit kumar
 ```
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
