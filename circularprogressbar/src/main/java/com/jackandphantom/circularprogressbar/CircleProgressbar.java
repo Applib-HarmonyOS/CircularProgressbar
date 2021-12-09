@@ -135,9 +135,7 @@ public class CircleProgressbar extends Component implements DrawTask, EstimateSi
         if (isTouchEnabled) {
             enabledTouch(isTouchEnabled);
         }
-        addDrawTask(this);
-        setEstimateSizeListener(this);
-        setTouchEventListener(this);
+        initialize();
     }
 
     /* Initialize paint object for drawing shapes  */
