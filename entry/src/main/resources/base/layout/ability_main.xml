@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DirectionalLayout
+    xmlns:ohos="http://schemas.huawei.com/res/ohos"
+    xmlns:app="http://schemas.huawei.com/apk/res-auto"
+    ohos:height="match_parent"
+    ohos:width="match_parent"
+    ohos:alignment="center"
+    ohos:orientation="vertical">
+    <Text
+        ohos:id="$+id:text_cpb"
+        ohos:height="match_content"
+        ohos:width="match_content"
+        ohos:background_element="$graphic:background_ability_main"
+        ohos:layout_alignment="horizontal_center"
+        ohos:text="$string:mainability_cpb"
+        ohos:text_size="40vp"
+        />
+    <com.jackandphantom.circularprogressbar.CircleProgressbar
+        ohos:id="$+id:circleprogressbar"
+        ohos:width="400vp"
+        ohos:height="400vp"
+        app:cpb_progress="0"
+        app:cpb_roundedCorner="true"
+        app:cpb_foregroundProgressWidth="45"
+        app:cpb_foregroundProgressColor="#1864c2"
+        app:cpb_touchEnabled="true"/>
+</DirectionalLayout>

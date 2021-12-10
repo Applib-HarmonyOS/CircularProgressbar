@@ -1,0 +1,16 @@
+{
+  "string": [
+    {
+      "name": "entry_MainAbility",
+      "value": "CircularProgressbar Library"
+    },
+    {
+      "name": "mainability_description",
+      "value": "Library for Circular progress bar"
+    },
+    {
+      "name": "mainability_cpb",
+      "value": "Circular Progress Bar"
+    }
+  ]
+}
