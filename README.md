@@ -35,7 +35,7 @@ dependencies {
 }	
 ```
 
-2. For using circularprogressbar from a remote repository in separate application, add the below dependencies in entry/build.gradle file.
+3. For using circularprogressbar from a remote repository in separate application, add the below dependencies in entry/build.gradle file.
 ```groovy
 dependencies {
 	implementation 'dev.applibgroup:circularprogressbar:1.0.0'
