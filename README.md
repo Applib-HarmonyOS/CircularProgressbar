@@ -1,3 +1,6 @@
+[![.github/workflows/main.yml](https://github.com/applibgroup/CircularProgressbar/actions/workflows/main.yml/badge.svg)](https://github.com/applibgroup/CircularProgressbar/actions/workflows/main.yml)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=applibgroup_CircularProgressbar&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=applibgroup_CircularProgressbar)
+
 # CircularProgressbar
 A HMOS library for Circular progress bar.
 
@@ -28,6 +31,14 @@ dependencies {
 ```groovy
 dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.har'])
+	testImplementation 'junit:junit:4.13'
+}	
+```
+
+3. For using circularprogressbar from a remote repository in separate application, add the below dependencies in entry/build.gradle file.
+```groovy
+dependencies {
+	implementation 'dev.applibgroup:circularprogressbar:1.0.0'
 	testImplementation 'junit:junit:4.13'
 }	
 ```
